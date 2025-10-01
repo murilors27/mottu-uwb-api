@@ -9,9 +9,7 @@ O objetivo é facilitar a gestão de veículos em pátios de alta densidade da M
 
 Esta solução foi desenvolvida para atender à Global Solution – Advanced Business Development with .NET, criando uma aplicação inovadora que auxilia em períodos de urgência com rastreamento e monitoramento de veículos em tempo real.
 
----
-
-## Requisitos atendidos:
+### Requisitos atendidos:
 
 - ✅ API REST com boas práticas de programação
 
