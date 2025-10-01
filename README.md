@@ -1,6 +1,6 @@
 # 🛰️ Mottu UWB API
 
-API RESTful desenvolvida em ASP.NET Core 9 com integração ao Oracle XE 21c, focada no rastreamento de motos utilizando sensores UWB (Ultra Wideband).
+API RESTful desenvolvida em ASP.NET Core 9 com integração ao PostgreSQL, focada no rastreamento de motos utilizando sensores UWB (Ultra Wideband).
 O objetivo é facilitar a gestão de veículos em pátios de alta densidade da Mottu, com localização precisa e identificação única de cada moto.
 
 ---
@@ -13,11 +13,11 @@ Esta solução foi desenvolvida para atender à Global Solution – Advanced Bus
 
 - ✅ API REST com boas práticas de programação
 
-- ✅ Persistência em banco de dados relacional (Oracle)
+- ✅ Persistência em banco de dados relacional (PostgreSQL)
 
-- ✅ Relacionamento 1:N (Moto → Sensores)
+- ✅ Relacionamentos 1:N e N:1 (Moto → Sensores; Moto → Localizações)
 
-- ✅ Documentação com Swagger
+- ✅ Documentação interativa com Swagger
 
 - ✅ Uso de Migrations para versionamento do banco
 
@@ -29,7 +29,7 @@ Esta solução foi desenvolvida para atender à Global Solution – Advanced Bus
 
 - ASP.NET Core 9
 - Entity Framework Core
-- Oracle Database (via EF Core Provider)
+- PostgreSQL (via EF Core Provider Npgsql)
 - Swagger / OpenAPI (Swashbuckle)
 - Visual Studio 2022
 - Razor Pages + TagHelpers
@@ -44,15 +44,25 @@ Esta solução foi desenvolvida para atender à Global Solution – Advanced Bus
 
 erDiagram
     MOTO ||--o{ SENSOR : possui
+    MOTO ||--o{ LOCALIZACAO : possui
     MOTO {
         int Id
-        string IdentificadorUWB
         string Modelo
+        string Cor
+        string IdentificadorUWB
+        string Status
     }
     SENSOR {
         int Id
         string Codigo
         int MotoId
+    }
+    LOCALIZACAO {
+        int Id
+        int MotoId
+        double PosX
+        double PosY
+        DateTime Timestamp
     }
     
 ```
@@ -64,7 +74,7 @@ erDiagram
 flowchart TD
     Client[Usuário / Razor Pages] --> API[API REST ASP.NET Core]
     API --> Swagger[Swagger UI]
-    API --> DB[(Oracle Database)]
+    API --> DB[(PostgreSQL Database)]
 
 ```
 
@@ -72,15 +82,20 @@ flowchart TD
 
 ## ⚙️ Como executar o projeto localmente
 
-1. Instale o Oracle XE 21c (ou outro Oracle disponível).
+1. Crie um banco no PostgreSQL, por exemplo:
 
-2. Configure a connection string no Program.cs ou appsettings.json.
-
-- Exemplo:
+```
+CREATE DATABASE mottu;
 
 ```
 
-User Id=APP;Password=APP;Data Source=localhost:1521/XEPDB1;
+3. Configure a connection string no appsettings.json:
+
+```
+
+"ConnectionStrings": {
+  "PostgresConnection": "Host=localhost;Port=5432;Database=mottu;Username=postgres;Password=postgres"
+}
 
 ```
 
@@ -131,6 +146,17 @@ dotnet run
 |PUT | api/sensor/{id} |  Atualiza sensor. |
 |DELETE | api/sensor/{id} |  Remove sensor. |
 
+### 📍 Localizações
+
+| Método | Endpoint                          | Descrição |
+|-------------------------------------|----------|----------------------------------------|
+Método	Endpoint	Descrição
+|GET	| api/localizacao	| Lista todas as localizações. |
+|GET	| api/localizacao/{id}	| Retorna localização por ID. |
+|POST	| api/localizacao	| Registra posição da moto no pátio. |
+|PUT	| api/localizacao/{id}	| Atualiza dados da localização. |
+|DELETE	| api/localizacao/{id}	| Remove localização. |
+
 ---
 
 ## 🧪 Exemplos de Testes
@@ -141,13 +167,15 @@ dotnet run
 
 POST /api/moto
 {
+  "modelo": "Honda CG 160",
+  "cor": "Preta",
   "identificadorUWB": "UWB-12345",
-  "modelo": "Honda CG 160"
+  "status": "Disponível"
 }
 
 ```
 
-### Cadastro de Sensor vinculado à Moto
+### Cadastro de Sensor
 
 ```
 
@@ -159,25 +187,42 @@ POST /api/sensor
 
 ```
 
-### Retorno esperado
+### Cadastro de Localização
+
+```
+
+POST /api/localizacao
+{
+  "motoId": 1,
+  "posX": 12.34,
+  "posY": 56.78,
+  "timestamp": "2025-10-01T03:15:00Z"
+}
+
+```
+
+### Retorno esperado (exemplo Moto)
 
 ```
 
 {
   "id": 1,
-  "codigo": "SENSOR-01",
-  "motoId": 1
+  "modelo": "Honda CG 160",
+  "cor": "Preta",
+  "identificadorUWB": "UWB-12345",
+  "status": "Disponível",
+  "sensores": [],
+  "localizacoes": []
 }
 
 ```
-
-Também é possível testar todas as rotas via Swagger.
 
 ---
 
 ## 🖥️ Projeto Razor Pages
 
-Para demonstrar Razor e TagHelpers, foi criada uma página simples que consome a API de motos e lista os registros em uma tabela HTML.
+Foi criada uma página simples que consome a API de motos e lista os registros em uma tabela HTML.
+
 Exemplo de uso de TagHelper no Razor:
 
 ```
@@ -187,7 +232,6 @@ Exemplo de uso de TagHelper no Razor:
     <input asp-for="IdentificadorUWB" class="form-control" />
     <button type="submit" class="btn btn-primary">Cadastrar Moto</button>
 </form>
-
 
 ```
 
