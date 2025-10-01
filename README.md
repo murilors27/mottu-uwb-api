@@ -113,30 +113,22 @@ dotnet run
 ### 🏍️ Motos
 
 | Método | Endpoint                          | Descrição |
-
+|-------------------------------------|----------|----------------------------------------|
 | GET | api/moto | Lista todas as motos cadastradas. |
-
 |GET | api/moto/{id} | Retorna uma moto pelo ID. |
-
 |POST | api/moto | Cadastra nova moto (IdentificadorUWB deve ser único). |
-
 |PUT | api/moto/{id} | Atualiza dados de uma moto. |
-
 |DELETE | api/moto/{id} | Remove moto. |
 
 
 ### 📡 Sensores
 
 | Método | Endpoint                          | Descrição |
-
+|-------------------------------------|----------|----------------------------------------|
 |GET | api/sensor |  Lista todos os sensores. |
-
 |GET | api/sensor/{id} |  Retorna sensor pelo ID. |
-
 |POST | api/sensor |  Cadastra sensor. |
-
 |PUT | api/sensor/{id} |  Atualiza sensor. |
-
 |DELETE | api/sensor/{id} |  Remove sensor. |
 
 ---
