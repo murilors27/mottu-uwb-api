@@ -1,0 +1,26 @@
+﻿@page
+@model Mottu.Web.Pages.Motos.IndexModel
+
+<h2>Lista de Motos</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Identificador UWB</th>
+            <th>Modelo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var moto in Model.Motos)
+        {
+            <tr>
+                <td>@moto.Id</td>
+                <td>@moto.IdentificadorUWB</td>
+                <td>@moto.Modelo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-page="Create" class="btn btn-primary">Cadastrar Moto</a>
