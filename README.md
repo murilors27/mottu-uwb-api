@@ -183,7 +183,7 @@ Também é possível testar todas as rotas via Swagger.
 
 ---
 
-##🖥️ Projeto Razor Pages
+## 🖥️ Projeto Razor Pages
 
 Para demonstrar Razor e TagHelpers, foi criada uma página simples que consome a API de motos e lista os registros em uma tabela HTML.
 Exemplo de uso de TagHelper no Razor:
