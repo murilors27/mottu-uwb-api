@@ -3,6 +3,8 @@
 API RESTful desenvolvida em ASP.NET Core 9 com integração ao Oracle XE 21c, focada no rastreamento de motos utilizando sensores UWB (Ultra Wideband).
 O objetivo é facilitar a gestão de veículos em pátios de alta densidade da Mottu, com localização precisa e identificação única de cada moto.
 
+---
+
 🎯 Objetivo do Projeto
 
 Esta solução foi desenvolvida para atender à Global Solution – Advanced Business Development with .NET, criando uma aplicação inovadora que auxilia em períodos de urgência com rastreamento e monitoramento de veículos em tempo real.
