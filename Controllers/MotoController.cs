@@ -1,88 +1,65 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Mottu.Uwb.Api.Data;
 using Mottu.Uwb.Api.Models;
+using Mottu.Uwb.Api.Services;
 
 namespace Mottu.Uwb.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class MotoController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly MotoService _service;
 
-        public MotoController(AppDbContext context)
+        public MotoController(MotoService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: api/moto
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Moto>>> GetAll()
         {
-            return await _context.Motos.Include(m => m.Sensor).ToListAsync();
+            var motos = await _service.GetAllAsync();
+            return Ok(motos);
         }
 
-        // GET: api/moto/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Moto>> GetById(int id)
         {
-            var moto = await _context.Motos.Include(m => m.Sensor).FirstOrDefaultAsync(m => m.Id == id);
+            var moto = await _service.GetByIdAsync(id);
             if (moto == null)
-                return NotFound();
-
-            return moto;
+                return NotFound("Moto não encontrada.");
+            return Ok(moto);
         }
 
-        // POST: api/moto
         [HttpPost]
-        public async Task<ActionResult<Moto>> Create(Moto moto)
+        public async Task<ActionResult<Moto>> Post(Moto moto)
         {
-            var lista = await _context.Motos.ToListAsync();
-            var exists = lista.Any(m => m.IdentificadorUWB == moto.IdentificadorUWB);
+            var created = await _service.CreateAsync(moto);
+            if (created == null)
+                return BadRequest("Já existe uma moto com esse IdentificadorUWB.");
 
-            if (exists)
-                return BadRequest($"Já existe uma moto com IdentificadorUWB '{moto.IdentificadorUWB}'.");
-
-            _context.Motos.Add(moto);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = moto.Id }, moto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        // PUT: api/moto/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Moto moto)
+        public async Task<IActionResult> Put(int id, Moto moto)
         {
-            if (id != moto.Id)
-                return BadRequest();
+            var updated = await _service.UpdateAsync(id, moto);
+            if (!updated)
+                return NotFound("Moto não encontrada ou ID inválido.");
 
-            var motoExistente = await _context.Motos.FindAsync(id);
-            if (motoExistente == null)
-                return NotFound();
-
-            motoExistente.Modelo = moto.Modelo;
-            motoExistente.Cor = moto.Cor;
-            motoExistente.IdentificadorUWB = moto.IdentificadorUWB;
-            motoExistente.Status = moto.Status;
-            motoExistente.SensorId = moto.SensorId;
-
-            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/moto/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var moto = await _context.Motos.FindAsync(id);
-            if (moto == null)
-                return NotFound();
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted)
+                return NotFound("Moto não encontrada.");
 
-            _context.Motos.Remove(moto);
-            await _context.SaveChangesAsync();
             return NoContent();
         }
     }
 }
-

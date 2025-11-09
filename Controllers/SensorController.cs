@@ -1,71 +1,61 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Mottu.Uwb.Api.Data;
 using Mottu.Uwb.Api.Models;
+using Mottu.Uwb.Api.Services;
 
 namespace Mottu.Uwb.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class SensorController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly SensorService _service;
 
-        public SensorController(AppDbContext context)
+        public SensorController(SensorService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: api/sensor
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Sensor>>> GetAll()
         {
-            return await _context.Sensores.ToListAsync();
+            var sensores = await _service.GetAllAsync();
+            return Ok(sensores);
         }
 
-        // GET: api/sensor/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Sensor>> GetById(int id)
         {
-            var sensor = await _context.Sensores.FindAsync(id);
-            return sensor is null ? NotFound() : Ok(sensor);
+            var sensor = await _service.GetByIdAsync(id);
+            if (sensor == null)
+                return NotFound("Sensor não encontrado.");
+            return Ok(sensor);
         }
 
-        // POST: api/sensor
         [HttpPost]
         public async Task<ActionResult<Sensor>> Create(Sensor sensor)
         {
-            _context.Sensores.Add(sensor);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = sensor.Id }, sensor);
+            var created = await _service.CreateAsync(sensor);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        // PUT: api/sensor/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, Sensor sensor)
         {
-            if (id != sensor.Id) return BadRequest();
+            var updated = await _service.UpdateAsync(id, sensor);
+            if (!updated)
+                return NotFound("Sensor não encontrado ou ID inválido.");
 
-            var existing = await _context.Sensores.FindAsync(id);
-            if (existing is null) return NotFound();
-
-            existing.Localizacao = sensor.Localizacao;
-            existing.Patio = sensor.Patio;
-
-            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/sensor/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var sensor = await _context.Sensores.FindAsync(id);
-            if (sensor is null) return NotFound();
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted)
+                return NotFound("Sensor não encontrado.");
 
-            _context.Sensores.Remove(sensor);
-            await _context.SaveChangesAsync();
             return NoContent();
         }
     }

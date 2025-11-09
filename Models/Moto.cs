@@ -8,6 +8,7 @@
         public string IdentificadorUWB { get; set; } = null!;
         public int SensorId { get; set; }
         public string Status { get; set; } = "Disponível";
+        public bool Ativo { get; set; } = true;
 
         public Sensor? Sensor { get; set; }
     }

@@ -1,5 +1,4 @@
 ﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Mottu.Uwb.Api": {
       "commandName": "Project",
