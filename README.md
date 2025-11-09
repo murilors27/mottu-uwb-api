@@ -26,7 +26,7 @@ A aplicação se propõe a simular uma **infraestrutura de rastreamento veicular
 | **Segurança via API Key** | Middleware próprio para validação do cabeçalho `X-Api-Key`. | ✅ |
 | **Testes Unitários e de Integração (xUnit)** | Cobertura de endpoints principais usando `WebApplicationFactory`. | ✅ |
 | **Deploy Local + Configuração Razor Pages** | Front-end auxiliar para visualização e cadastro. | ✅ |
-| **ML.NET (previsto)** | Endpoint de previsão de uso e falha dos sensores — reservado para expansão. | 🔜 |
+| **ML.NET (previsto)** | Endpoint de previsão de uso e falha dos sensores — reservado para expansão. | ✅ |
 
 ---
 
